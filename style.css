@@ -1,8 +1,7 @@
 #tic-tac-toe {
   display: grid;
-  grid-template-columns: 200px 200px 200px;
-  grid-template-rows: 200px 200px 200px;
   gap: 5px;
+  /* Other styles add via JS subject to gameboard size, e.g. grid-template-columns */
 }
 
 #tic-tac-toe div {
@@ -11,4 +10,5 @@
   align-items: center;
   border: 1px solid black;
   background-color: rgb(211, 211, 211);
+  cursor: pointer;
 }
