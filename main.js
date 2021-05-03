@@ -6,13 +6,39 @@
 
 // Game settings - global variables
 let gridSize = 3;
-let whoseTurn = 1;
-let gameWon = false;
+let round = 0;
+let gameOver = false;
 let gameBoard = generateGameBoard(gridSize);
 
-// Player marks -
-let player1 = "X";
-let player2 = "O";
+// Query selectors
+let message = document.querySelector("#message");
+let resetBtn = document.querySelector("#reset");
+resetBtn.addEventListener("click", resetGameBoard);
+
+// Player profile
+let player1 = {
+  id: 1,
+  mark: "X",
+  results: {
+    wins: 0,
+    ties: 0,
+    losses: 0,
+  },
+};
+
+let player2 = {
+  id: 2,
+  mark: "O",
+  results: {
+    wins: 0,
+    ties: 0,
+    losses: 0,
+  },
+};
+
+let whoseTurn = player1.id;
+
+function setWhoseTurn() {}
 
 // Values in gameBoard represent a player's action
 function generateGameBoard(gridSize) {
@@ -33,78 +59,129 @@ function gridTemplateString(gridSize) {
   return gridValue;
 }
 
-//Display board on the screen
-function updateGameBoard() {
-  // Create grid container for game squares
-  const grid = document.createElement("main");
+function playGame() {
+  // Start game with blank gameboard
+  displayGameBoard(gameBoard);
+}
+
+function displayGameBoard() {
+  // Add main grid container
+  const container = document.querySelector("#gameboard");
+  const grid = document.createElement("section");
   grid.id = "grid-container";
   grid.style.gridTemplateColumns = gridTemplateString(gridSize);
   grid.style.gridTemplateRows = gridTemplateString(gridSize);
-  document.body.appendChild(grid);
+  container.appendChild(grid);
 
-  // Add squares and values to the grid based on the current state of the gameboard
+  // Add squares to the grid based on the current state of the gameboard
   for (let i = 0; i < gameBoard.length; i++) {
     const newSquare = document.createElement("div");
     newSquare.id = `${i}`;
-    const squareStatus = gameBoard[i];
-    if (squareStatus === 1) {
-      newSquare.innerHTML = `${player1}`;
-    } else if (squareStatus === 2) {
-      newSquare.innerHTML = `${player2}`;
-    }
     grid.appendChild(newSquare);
   }
 
-  takeATurn();
-}
-
-function takeATurn() {
+  // Add event listeners to each square
   const squares = document.querySelectorAll("#grid-container div");
 
   for (let i = 0; i < squares.length; i++) {
     const squareClicked = squares[i];
 
     squareClicked.addEventListener("click", function (e) {
+      // Get square that was clicked
       let boardIndex = parseInt(e.target.id);
-      let squareValue = gameBoard[boardIndex];
 
-      // Check if square clicked is empty, X or O
-      if (squareValue === 0) {
-        gameBoard[boardIndex] = whoseTurn;
+      let boardValue = gameBoard[boardIndex];
 
-        result = checkWinner();
-        if (result) {
-          console.log(result);
-        }
-        updateTurn();
-        clearGameBoard();
+      // Check if square is empty and process the turn
+      if (gameOver || boardValue != 0) {
+        return;
+      } else {
+        takeATurn(boardIndex);
+        updateWhoseTurn();
         updateGameBoard();
       }
     });
   }
 }
 
-function clearGameBoard() {
-  let ticTacToe = document.querySelector("#grid-container");
-  ticTacToe.remove();
+function takeATurn(boardIndex) {
+  // Update gameboard based on whose turn it is
+  gameBoard[boardIndex] = whoseTurn;
+
+  // Check if winner (1, 2, 'tie' or null)
+  let result = checkWinner();
+  if (result != null) {
+    gameOver = true;
+    postGameCelebration(result);
+  }
 }
 
-function updateTurn() {
-  if (whoseTurn === 1) {
-    whoseTurn = 2;
+function postGameCelebration(result) {
+  message.innerText = result;
+  round++;
+  updateScores(result);
+}
+
+function updateScores(result) {
+  if (result === player1.id) {
+    player1.results.wins++;
+    player2.results.losses++;
+  } else if (result === player2.id) {
+    player2.results.wins++;
+    player1.results.losses++;
   } else {
-    whoseTurn = 1;
+    player1.results.ties++;
+    player2.results.ties++;
   }
+  // 
+  console.log(`Round ${round} results`)
+  console.log('-----------')
+  console.log(
+    `Player 1: ${player1.results.wins}-${player1.results.losses}-${player1.results.ties}`
+  );
+  console.log(
+    `Player 2: ${player2.results.wins}-${player2.results.losses}-${player2.results.ties}`
+  );
+}
+
+function updateGameBoard() {
+  let squares = document.querySelectorAll("#grid-container div");
+
+  for (let i = 0; i < squares.length; i++) {
+    if (gameBoard[i] === 0) {
+      squares[i].innerHTML = "";
+    } else if (gameBoard[i] === 1) {
+      squares[i].innerHTML = `${player1.mark}`;
+    } else if (gameBoard[i] === 2) {
+      squares[i].innerHTML = `${player2.mark}`;
+    }
+  }
+}
+
+function updateWhoseTurn() {
+  if (whoseTurn === player1.id) {
+    whoseTurn = player2.id;
+  } else {
+    whoseTurn = player1.id;
+  }
+}
+
+function resetGameBoard() {
+  gameBoard = generateGameBoard(gridSize);
+  whoseTurn = player1.id;
+  gameOver = false;
+  updateGameBoard();
 }
 
 function checkWinner() {
   if (checkMatrix("row") || checkMatrix("column") || checkMatrix("diagonal")) {
-    console.log("Winner!");
+    console.log(`Player ${whoseTurn} is the winner!`);
     return whoseTurn;
   } else if (checkTie()) {
+    console.log(`It's a tie!`);
     return "tie";
   } else {
-    return false;
+    return null;
   }
 }
 
@@ -186,11 +263,4 @@ function checkTie() {
 
 // Start game
 
-updateGameBoard();
-
-// What to do when there's a winner (gameWon = true):
-//    function endGame() {
-//        - Display congrats message
-//        - Ask if user want to play another game?
-//        - Keep track of score
-// }
+playGame();
