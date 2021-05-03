@@ -1,122 +1,192 @@
-// PseudoCode
+// TODO features if time:
+//  - More than 2 players
+//  - Player avatars - user can select img rather than using just X and O
+//  - Results tracking, i.e. tournament with best of 3/5/7 etc.
+//  -
 
-// Create a gameboard:
-//    HTML: nil - use JS to render the gameboard.
-//    JS: declare a variable 'gameBoard' to store the current state of the game:
-//      - 3 arrays of 3 values, each representing a game square -> var gameBoard = [[0,0,0],[0,0,0],[0,0,0]]
-//        - 0 = blank square
-//        - 1 = playerOne
-//        - 2 = playerTwo
-//      - All squares start as blank - i.e. 0.
-
-//      - function displayGameBoard() {
-//              - loop through each array element and create a div and add some content (blank, X, or 0). Could be an image/avatar selected by user etc.
-//              - add classes for style.
-//            }
-
-// ToDo: function to generate gameBoard based on gridsize
-let gameBoard = [1,0,0,1,0,0,1,0,0]
+// Game settings - global variables
 let gridSize = 3;
-
-// Player 1  always starts first
 let whoseTurn = 1;
+let gameWon = false;
+let gameBoard = generateGameBoard(gridSize);
 
-function displayGameBoard(gameBoard) {
+// Player marks -
+let player1 = "X";
+let player2 = "O";
 
-  // Delete previous version of gameboard if exists
-  let ticTacToe = document.querySelectorAll('#tic-tac-toe')
-  if (ticTacToe) {
-    ticTacToe.parentNode.removeChild(ticTacToe);
-
+// Values in gameBoard represent a player's action
+function generateGameBoard(gridSize) {
+  let gameBoard = [];
+  const totalSquares = gridSize * gridSize;
+  for (let i = 0; i < totalSquares; i++) {
+    gameBoard.push(0);
   }
+  return gameBoard;
+}
 
-  // Create parent div
-  const parentDiv = document.createElement('main')
-  parentDiv.id = 'tic-tac-toe'
+// Build grid based on the specified grid size
+function gridTemplateString(gridSize) {
+  let gridValue = "";
+  for (let i = 0; i < gridSize; i++) {
+    gridValue += "200px ";
+  }
+  return gridValue;
+}
 
-  // Add grid styles - TO DO: create function to generate strings based on grid size
-  parentDiv.style.gridTemplateColumns = "200px 200px 200px"
-  parentDiv.style.gridTemplateRows = "200px 200px 200px"
-  
-  // Add to body 
-  document.body.appendChild(parentDiv)
+//Display board on the screen
+function updateGameBoard() {
+  // Create grid container for game squares
+  const grid = document.createElement("main");
+  grid.id = "grid-container";
+  grid.style.gridTemplateColumns = gridTemplateString(gridSize);
+  grid.style.gridTemplateRows = gridTemplateString(gridSize);
+  document.body.appendChild(grid);
 
-
-  // Add squares and values to the grid based on the current gameboard
+  // Add squares and values to the grid based on the current state of the gameboard
   for (let i = 0; i < gameBoard.length; i++) {
-      const newSquare = document.createElement('div')
-      newSquare.id = `${i}`
-      const squareStatus = gameBoard[i] 
-      if (squareStatus === 1) {
-        newSquare.innerHTML = `X`
-      } else if (squareStatus === 2) {
-        newSquare.innerHTML = `O`
-      } 
-      parentDiv.appendChild(newSquare)
-
+    const newSquare = document.createElement("div");
+    newSquare.id = `${i}`;
+    const squareStatus = gameBoard[i];
+    if (squareStatus === 1) {
+      newSquare.innerHTML = `${player1}`;
+    } else if (squareStatus === 2) {
+      newSquare.innerHTML = `${player2}`;
     }
+    grid.appendChild(newSquare);
+  }
+
+  takeATurn();
 }
 
-displayGameBoard(gameBoard)
+function takeATurn() {
+  const squares = document.querySelectorAll("#grid-container div");
 
+  for (let i = 0; i < squares.length; i++) {
+    const squareClicked = squares[i];
 
-// Taking a Turn:
-//    On click of a square:
-//        function takeATurn(whoseTurn) {
-//          check gameboard array:
-//            if square is X or O - do nothing
-//            if square is blank - change to X or O depending on whoseTurn
-//                - update gameboard array with new value (0,1 or 2) dpeending on whoseTurn
-//                - display new board
-//                - check if winner. If no winner update whoseTurn and allow another turn.
-//         }
+    squareClicked.addEventListener("click", function (e) {
+      let boardIndex = parseInt(e.target.id);
+      let squareValue = gameBoard[boardIndex];
 
+      // Check if square clicked is empty, X or O
+      if (squareValue === 0) {
+        gameBoard[boardIndex] = whoseTurn;
 
-function takeATurn(whoseTurn, gameBoard) {
-  const squares = document.querySelectorAll('#tic-tac-toe div')
-  for (let i = 0 ; i < squares.length; i++) {
-    const squareClicked = squares[i]
-    squareClicked.addEventListener('click', function (e) {
-      let gameBoardValue = gameBoard[parseInt(e.target.id)]
-      
-      // Check if square click is empty, X or O
-      if (gameBoardValue === 0) {
-        gameBoardValue = whoseTurn
-      } else {
-        console.log('Square taken')
+        result = checkWinner();
+        if (result) {
+          console.log(result);
+        }
+        updateTurn();
+        clearGameBoard();
+        updateGameBoard();
       }
-      displayGameBoard(gameBoard)
-
-      // 
-    })
+    });
   }
 }
 
-takeATurn(whoseTurn, gameBoard)
+function clearGameBoard() {
+  let ticTacToe = document.querySelector("#grid-container");
+  ticTacToe.remove();
+}
 
+function updateTurn() {
+  if (whoseTurn === 1) {
+    whoseTurn = 2;
+  } else {
+    whoseTurn = 1;
+  }
+}
 
-// Check if Winner:
-//    Check if player has 3 in a row - rows, columns, diagonals
-  //    function checkWinner() {
-  //        function checkRow() {
-  //            Loop through each row array. If row1[0] = row1[1] = row1[2] WINNER!
-  //            if winner, return true
-  //        }
+function checkWinner() {
+  if (checkMatrix("row") || checkMatrix("column") || checkMatrix("diagonal")) {
+    console.log("Winner!");
+    return whoseTurn;
+  } else if (checkTie()) {
+    return "tie";
+  } else {
+    return false;
+  }
+}
 
-  //        function checkColumn() {
-  //            Loop through each row array row 1[0] = row2[0] = row3[0] => WINNER!
-  //            if winner, return true
-  //        }
+function checkMatrix(matrix) {
+  let checkMatrix;
+  if (matrix === "row") {
+    checkMatrix = rowMatrix();
+  } else if (matrix === "column") {
+    checkMatrix = columnMatrix();
+  } else if (matrix === "diagonal") {
+    checkMatrix = diagonalMatrix();
+  }
 
-  //        function checkDiagonal() {
-  //            Loop through each row array and it's elements:
-  //              - if row1[0] = row2[1] = row3[2] => WINNER!
-  //              - if row1[2] = row2[1] = row3[0] => WINNER!
-  //            if winner, return true
-  //        }
+  // Check if values in each matrix array are equal
+  for (let i = 0; i < checkMatrix.length; i++) {
+    let winner = checkMatrix[i].every((value) => {
+      if (value != 0 && value === checkMatrix[i][0]) {
+        return true;
+      }
+    });
 
-  //        if winner, update variable gameWon = true
-  //  }
+    if (winner) {
+      return true;
+    }
+  }
+}
+
+function rowMatrix() {
+  let rows = [];
+  for (let i = 0; i < gameBoard.length; i += gridSize) {
+    rows.push(gameBoard.slice(i, i + gridSize));
+  }
+  return rows;
+}
+
+function columnMatrix() {
+  let columnMatrix = [];
+
+  for (let i = 0; i < gridSize; i++) {
+    let column = [];
+    for (let j = 0; j < gameBoard.length; j += gridSize) {
+      column.push(gameBoard[i + j]);
+    }
+    columnMatrix.push(column);
+  }
+  return columnMatrix;
+}
+
+function diagonalMatrix() {
+  // Only 2 diagonals
+  let diagonalMatrix = [];
+
+  let diagonal1 = [];
+  for (let i = 0; i < gameBoard.length; i += gridSize + 1) {
+    diagonal1.push(gameBoard[i]);
+  }
+
+  let diagonal2 = [];
+  for (
+    let i = gridSize - 1;
+    i <= gameBoard.length - gridSize;
+    i += gridSize - 1
+  ) {
+    diagonal2.push(gameBoard[i]);
+  }
+
+  diagonalMatrix.push(diagonal1, diagonal2);
+
+  return diagonalMatrix;
+}
+
+function checkTie() {
+  if (!gameBoard.includes(0)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+// Start game
+
+updateGameBoard();
 
 // What to do when there's a winner (gameWon = true):
 //    function endGame() {

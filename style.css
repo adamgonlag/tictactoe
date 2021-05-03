@@ -1,10 +1,10 @@
-#tic-tac-toe {
+#grid-container {
   display: grid;
   gap: 5px;
   /* Other styles add via JS subject to gameboard size, e.g. grid-template-columns */
 }
 
-#tic-tac-toe div {
+#grid-container div {
   display: flex;
   justify-content: center;
   align-items: center;
