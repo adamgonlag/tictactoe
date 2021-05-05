@@ -4,16 +4,47 @@
 //  - Results tracking, i.e. tournament with best of 3/5/7 etc.
 //  -
 
-// Game settings - global variables
+// Game options - global variables
 let gridSize = 3;
 let round = 0;
 let gameOver = false;
 let gameBoard = generateGameBoard(gridSize);
 
+let screens = ["splash", "settings", "player-select", "match-up", "game"];
+
 // Query selectors
+// Text
 let message = document.querySelector("#message");
-let resetBtn = document.querySelector("#reset");
-resetBtn.addEventListener("click", resetGameBoard);
+
+// Buttons
+let splashPlayBtn = document.querySelector("#splash-play-btn");
+let optionsBtn = document.querySelector("#options-btn");
+let saveoptionsBtn = document.querySelector("#save-options-btn");
+let rematchBtn = document.querySelector("#rematch");
+let endGameBtn = document.querySelector("#end-game-btn");
+
+// Screens
+let splashScreen = document.querySelector("#splash");
+let optionsScreen = document.querySelector("#options");
+let playerSelectScreen = document.querySelector("#player-select");
+let matchUpScreen = document.querySelector("#match-up");
+let gameScreen = document.querySelector("#game");
+
+// Change Screens
+splashPlayBtn.addEventListener("click", function () {
+  goToScreen("player-select");
+});
+optionsBtn.addEventListener("click", function () {
+  goToScreen("options");
+});
+saveoptionsBtn.addEventListener("click", function () {
+  goToScreen("splash");
+});
+endGameBtn.addEventListener("click", function () {
+  goToScreen("splash");
+});
+
+rematchBtn.addEventListener("click", resetGameBoard);
 
 // Player profile
 let player1 = {
@@ -38,7 +69,39 @@ let player2 = {
 
 let whoseTurn = player1.id;
 
-function setWhoseTurn() {}
+function goToScreen(screen) {
+  if (screen === "splash") {
+    splashScreen.style.display = "flex";
+    optionsScreen.style.display = "none";
+    playerSelectScreen.style.display = "none";
+    matchUpScreen.style.display = "none";
+    gameScreen.style.display = "none";
+  } else if (screen === "options") {
+    splashScreen.style.display = "none";
+    optionsScreen.style.display = "flex";
+    playerSelectScreen.style.display = "none";
+    matchUpScreen.style.display = "none";
+    gameScreen.style.display = "none";
+  } else if (screen === "player-select") {
+    splashScreen.style.display = "none";
+    optionsScreen.style.display = "none";
+    playerSelectScreen.style.display = "flex";
+    matchUpScreen.style.display = "none";
+    gameScreen.style.display = "none";
+  } else if (screen === "match-up") {
+    splashScreen.style.display = "none";
+    optionsScreen.style.display = "none";
+    playerSelectScreen.style.display = "none";
+    matchUpScreen.style.display = "flex";
+    gameScreen.style.display = "none";
+  } else if (screen === "game") {
+    splashScreen.style.display = "none";
+    optionsScreen.style.display = "none";
+    playerSelectScreen.style.display = "none";
+    matchUpScreen.style.display = "none";
+    gameScreen.style.display = "block";
+  }
+}
 
 // Values in gameBoard represent a player's action
 function generateGameBoard(gridSize) {
@@ -61,6 +124,7 @@ function gridTemplateString(gridSize) {
 
 function playGame() {
   // Start game with blank gameboard
+  goToScreen("match-up");
   displayGameBoard(gameBoard);
 }
 
@@ -133,9 +197,9 @@ function updateScores(result) {
     player1.results.ties++;
     player2.results.ties++;
   }
-  // 
-  console.log(`Round ${round} results`)
-  console.log('-----------')
+  //
+  console.log(`Round ${round} results`);
+  console.log("-----------");
   console.log(
     `Player 1: ${player1.results.wins}-${player1.results.losses}-${player1.results.ties}`
   );

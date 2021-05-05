@@ -8,9 +8,136 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <main id="gameboard"></main>
-    <h1 id="message"></h1>
-    <button id="reset">reset</button>
+    <main>
+      <div id="overlay">
+        <div class="container">
+          <!-- Each section is a screen -->
+          <section class="screen" id="splash">
+            <img src="./assets/streetfighter-logo.png" alt="" />
+            <h1>TIC TAC TOE EDITION</h1>
+            <button id="splash-play-btn">GAME START</button>
+            <button id="options-btn">OPTIONS</button>
+          </section>
+
+          <section class="screen" id="options">
+            <h1>OPTIONS</h1>
+            <div id="options-grid">
+              <h2>GAMEBOARD SIZE</h2>
+              <div class="options-selection">
+                <h2 class="options-center">3</h2>
+                <h2 class="options-center">4</h2>
+                <h2 class="options-center">5</h2>
+              </div>
+              <h2>GAMES PER MATCH</h2>
+              <div class="options-selection">
+                <h2 class="options-center">3</h2>
+                <h2 class="options-center">5</h2>
+                <h2 class="options-center">7</h2>
+              </div>
+              <h2>TIME LIMIT</h2>
+              <div class="options-selection">
+                <h2 class="option-selected">YES</h2>
+                <h2>NO</h2>
+              </div>
+              <h2>MUSIC</h2>
+              <div class="options-selection">
+                <h2>YES</h2>
+                <h2>NO</h2>
+              </div>
+            </div>
+
+            <button id="save-options-btn">Save</button>
+          </section>
+
+          <section class="screen" id="player-select">
+            <h1>Player Select</h1>
+            <div id="player-select-grid">
+              <img
+                id="p1"
+                class="p-tag"
+                src="./assets/streetfighter-1p.png"
+                alt=""
+              />
+              <img
+                id="p2"
+                class="p-tag"
+                src="./assets/streetfighter-2p.png"
+                alt=""
+              />
+              <img
+                id="player1"
+                class="player-portrait"
+                src="./assets/streetfighter-guile.png"
+                alt=""
+              />
+              <div class="sub-grid" id="players-sub-grid">
+                <img
+                  id="ryu"
+                  src="./assets/streetfighter-ryu-small.png"
+                  alt=""
+                />
+                <img
+                  id="ehonda"
+                  src="./assets/streetfighter-ehonda-small.png"
+                  alt=""
+                />
+                <img
+                  id="blanka"
+                  src="./assets/streetfighter-blanka-small.png"
+                  alt=""
+                />
+                <img
+                  id="guile"
+                  src="./assets/streetfighter-guile-small.png"
+                  alt=""
+                />
+                <img
+                  id="ken"
+                  src="./assets/streetfighter-ken-small.png"
+                  alt=""
+                />
+                <img
+                  id="chunli"
+                  src="./assets/streetfighter-chunli-small.png"
+                  alt=""
+                />
+                <img
+                  id="zangief"
+                  src="./assets/streetfighter-zangief-small.png"
+                  alt=""
+                />
+                <img
+                  id="dhalism"
+                  src="./assets/streetfighter-dhalsim-small.png"
+                  alt=""
+                />
+              </div>
+              <img
+                id="player2"
+                class="player-portrait"
+                src="./assets/streetfighter-guile-rev.png"
+                alt=""
+              />
+            </div>
+          </section>
+
+          <section class="screen" id="match-up">
+            <img src="./assets/streetfighter-ryu-vs.png" alt="" />
+            <h1>VS.</h1>
+            <img src="./assets/streetfighter-blanka-rev-vs.png" alt="" />
+          </section>
+
+          <section class="screen" id="game">
+            <h1>Gamescreen</h1>
+            <div id="gameboard"></div>
+            <h1 id="message"></h1>
+            <button id="rematch">Next Round</button>
+            <button id="end-game-btn">End Game</button>
+          </section>
+        </div>
+      </div>
+    </main>
+
     <script src="./main.js"></script>
   </body>
 </html>
