@@ -6,6 +6,9 @@
 
 // Game options - global variables
 let gridSize = 3;
+let numberOfGames = 3;
+let timeLimit = false;
+let musicPlaying = true;
 let round = 0;
 let gameOver = false;
 let gameBoard = generateGameBoard(gridSize);
@@ -16,12 +19,85 @@ let screens = ["splash", "settings", "player-select", "match-up", "game"];
 // Text
 let message = document.querySelector("#message");
 
+// Audio
+const audio = document.querySelector("audio");
+
 // Buttons
 let splashPlayBtn = document.querySelector("#splash-play-btn");
 let optionsBtn = document.querySelector("#options-btn");
 let saveoptionsBtn = document.querySelector("#save-options-btn");
 let rematchBtn = document.querySelector("#rematch");
 let endGameBtn = document.querySelector("#end-game-btn");
+
+// Options
+let boardSizeOptions = document.querySelectorAll(".board-size");
+let numGames = document.querySelectorAll(".num-games");
+let timeLimitOptions = document.querySelectorAll(".time-option");
+let musicOptions = document.querySelectorAll(".music-option");
+
+let allOptions = [boardSizeOptions, numGames, timeLimitOptions, musicOptions];
+
+// Set options event listeners
+for (let i = 0; i < allOptions.length; i++) {
+  selectOption(allOptions[i]);
+}
+
+function selectOption(optionsList) {
+  for (let i = 0; i < optionsList.length; i++) {
+    let currentOption = optionsList[i];
+    currentOption.addEventListener("click", function (e) {
+      var target = e.target;
+
+      // Update each global option variable
+      if (optionsList[i].classList.contains("board-size")) {
+        var newSize = parseInt(target.innerText);
+        gridSize = newSize;
+      } else if (optionsList[i].classList.contains("num-games")) {
+        var newNumGames = parseInt(target.innerText);
+        numberOfGames = newNumGames;
+      } else if (optionsList[i].classList.contains("time-options")) {
+        if (target.innerText === "YES") {
+          timeLimit = true;
+        } else {
+          timeLimit = false;
+        }
+      } else if (optionsList[i].classList.contains("music-option")) {
+        console.log(target);
+        if (target.innerText === "YES") {
+          musicPlaying = true;
+        } else {
+          musicPlaying = false;
+        }
+        console.log(musicPlaying);
+        musicToggle();
+      }
+
+      // Update style of selected
+      target.classList.add("option-selected");
+      deselectOptions(currentOption, optionsList);
+    });
+  }
+}
+
+function deselectOptions(currentOption, optionsList) {
+  for (let i = 0; i < optionsList.length; i++) {
+    if (
+      optionsList[i] != currentOption &&
+      optionsList[i].classList.contains("option-selected")
+    ) {
+      optionsList[i].classList.remove("option-selected");
+    }
+  }
+}
+
+function musicToggle() {
+  if (musicPlaying == false) {
+    audio.pause();
+    // audio.currentTime = 0;
+  } else {
+    audio.play();
+  }
+}
 
 // Screens
 let splashScreen = document.querySelector("#splash");
@@ -30,7 +106,6 @@ let playerSelectScreen = document.querySelector("#player-select");
 let matchUpScreen = document.querySelector("#match-up");
 let gameScreen = document.querySelector("#game");
 
-// Change Screens
 splashPlayBtn.addEventListener("click", function () {
   goToScreen("player-select");
 });
@@ -83,18 +158,24 @@ function goToScreen(screen) {
     matchUpScreen.style.display = "none";
     gameScreen.style.display = "none";
   } else if (screen === "player-select") {
+    audio.src = "./assets/playerselect.mp3";
+    musicToggle();
     splashScreen.style.display = "none";
     optionsScreen.style.display = "none";
     playerSelectScreen.style.display = "flex";
     matchUpScreen.style.display = "none";
     gameScreen.style.display = "none";
   } else if (screen === "match-up") {
+    audio.src = "./assets/startbattle.mp3";
+    musicToggle();
     splashScreen.style.display = "none";
     optionsScreen.style.display = "none";
     playerSelectScreen.style.display = "none";
     matchUpScreen.style.display = "flex";
     gameScreen.style.display = "none";
   } else if (screen === "game") {
+    audio.src = "./assets/menu.mp3";
+    musicToggle();
     splashScreen.style.display = "none";
     optionsScreen.style.display = "none";
     playerSelectScreen.style.display = "none";
@@ -124,7 +205,7 @@ function gridTemplateString(gridSize) {
 
 function playGame() {
   // Start game with blank gameboard
-  goToScreen("match-up");
+  goToScreen("splash");
   displayGameBoard(gameBoard);
 }
 
