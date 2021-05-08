@@ -31,6 +31,8 @@ I started with mapping out the logic of Tic-Tac-Toe and writing pseudo-code to g
 
 Once basic functionbality was implemented, I created a wireframe of the Street Fighter menu and player select screens and commenced adding styles to each screen, then implemented additional Javascript to connect each screen.
 
+https://github.com/adamgonlag/tictactoe/blob/7d4f4fd9b1761bdbbe3b11cdca8e793b4843582c/main.js
+
 ## Known Bugs
 
 - Audio autoplay on page load is hit and miss.
