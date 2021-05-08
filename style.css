@@ -2,6 +2,8 @@
 
 * {
   box-sizing: border-box;
+  /* margin: 0;
+  padding: 0; */
 }
 
 body,
@@ -17,6 +19,8 @@ main {
   position: relative;
 }
 
+
+
 .container {
   display: flex;
   justify-content: center;
@@ -24,7 +28,6 @@ main {
   flex-direction: column;
 
 }
-
 
 h1 {
   font-size: 2rem;
@@ -199,9 +202,82 @@ button:hover {
   border-radius: 40px 40px 0 0;
 }
 
+
+#game {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.score-bar {
+  display: grid;
+  grid-template-columns: auto 1fr 1fr 1fr 1fr auto;
+  /* height:70px; */
+  width: 900px;
+  margin-bottom: 50px;
+  grid-template-areas: 
+  "p1-image p1-name p1-score p2-score p2-name p2-image"
+  "p1-image . p1-score p2-score . p2-image";
+  justify-items: center;
+  align-items: center;
+  gap:15px;
+  background-color: transparent
+  
+}
+
+.score {
+  /* background-color: rgba(34, 34, 119, 0.445); */
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+}
+
+.score h2 {
+  color:rgb(253, 218, 16);
+  font-size: 3rem;
+
+  
+}
+
+#p1-game-image {
+  grid-area: p1-image
+}
+#p1-score {
+  grid-area: p1-score
+}
+#p2-score{
+  grid-area: p2-score
+}
+#p2-game-image{
+  grid-area: p2-image
+}
+#p1-game-name{
+  grid-area: p1-name;
+  justify-self: left;
+}
+#timer{
+  grid-area: timer
+}
+#p2-game-name{
+  grid-area: p2-name;
+  justify-self: right;
+}
+
+
+
+.score-bar img {
+  height: 100px;
+  border:3px solid rgb(48, 48, 48);
+  box-shadow: 2px 2px violet
+
+}
+
 #grid-container {
   display: grid;
-  gap: 5px;
+  gap: 10px;
   /* Other styles add via JS subject to gameboard size, e.g. grid-template-columns */
 }
 
@@ -209,7 +285,32 @@ button:hover {
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 1px solid black;
-  background-color: rgb(211, 211, 211);
+  border: 6px solid rgb(58, 58, 58);
+  box-shadow: 2px 2px violet;
+  background-color: rgba(90, 90, 90, 0.747);
   cursor: pointer;
+  /* padding: 5px */
+}
+
+#grid-container div img {
+  height: 100%;
+  width: 100%
+}
+
+#game-message {
+  display: none;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(68, 21, 70, 0.349);
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+#game-message h1 {
+  font-size: 3rem;
+  color: white;
+  text-shadow: 2px 2px violet;
+
 }

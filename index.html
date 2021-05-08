@@ -9,7 +9,11 @@
   </head>
   <body>
     <main>
-      <div id="overlay">
+      <div id="overlay"></div>
+      <div id="game-message">
+        <h1>Round 1!</h1>
+      </div>
+
         <div class="container">
           <audio autoplay loop src="./assets/menu.mp3"></audio>
           <!-- Each section is a screen -->
@@ -68,10 +72,10 @@
               <img
                 id="player1"
                 class="player-portrait"
-                src="./assets/streetfighter-guile.png"
+                src="./assets/streetfighter-ryu.png"
                 alt=""
               />
-              <div class="sub-grid" id="players-sub-grid">
+              <div class="player-grid" id="players-sub-grid">
                 <img
                   id="ryu"
                   src="./assets/streetfighter-ryu-small.png"
@@ -108,7 +112,7 @@
                   alt=""
                 />
                 <img
-                  id="dhalism"
+                  id="dhalsim"
                   src="./assets/streetfighter-dhalsim-small.png"
                   alt=""
                 />
@@ -116,27 +120,41 @@
               <img
                 id="player2"
                 class="player-portrait"
-                src="./assets/streetfighter-guile-rev.png"
+                src=""
                 alt=""
               />
             </div>
           </section>
 
           <section class="screen" id="match-up">
-            <img src="./assets/streetfighter-ryu-vs.png" alt="" />
+            <img id='match-up1' src="" alt="" />
             <h1>VS.</h1>
-            <img src="./assets/streetfighter-blanka-rev-vs.png" alt="" />
+            <img id='match-up2' src="./assets/" alt="" />
           </section>
 
           <section class="screen" id="game">
-            <h1>Gamescreen</h1>
+            <div class="score-bar">
+              <img id="p1-game-image" src="" alt="">
+              <div id="p1-game-name">
+                <h2>Ryu</h2>
+              </div>
+              <div id="p1-score" class="score">
+                <h2>0</h2>
+              </div>
+              <div id="p2-score" class="score">
+                <h2>0</h2>
+              </div>
+              <div id="p2-game-name">
+                <h2>Dhalsim</h2>
+              </div>
+              <img id="p2-game-image" src="./assets/streetfighter-ryu-small.png" alt="">
+            </div>
             <div id="gameboard"></div>
-            <h1 id="message"></h1>
-            <button id="rematch">Next Round</button>
+
+            <!-- <button id="rematch">Next Round</button> -->
             <button id="end-game-btn">End Game</button>
           </section>
         </div>
-      </div>
     </main>
 
     <script src="./main.js"></script>
