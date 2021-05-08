@@ -444,17 +444,20 @@ function postRound(result) {
 
   // Check if game over
 
-  if (numberOfGames === 7) {
-    if (winner.results.wins === 5) {
-      gameOver = true;
-    }
-  } else if (numberOfGames === 5) {
-    if (winner.results.wins === 3) {
-      gameOver = true;
-    }
-  } else if (numberOfGames === 3) {
-    if (winner.results.wins === 2) {
-      gameOver = true;
+  console.log(result);
+  if (result != "tie") {
+    if (numberOfGames === 7) {
+      if (winner.results.wins === 5) {
+        gameOver = true;
+      }
+    } else if (numberOfGames === 5) {
+      if (winner.results.wins === 3) {
+        gameOver = true;
+      }
+    } else if (numberOfGames === 3) {
+      if (winner.results.wins === 2) {
+        gameOver = true;
+      }
     }
   }
 
