@@ -1,8 +1,5 @@
 // TODO features if time:
 //  - More than 2 players
-//  - Player avatars - user can select img rather than using just X and O
-//  - Results tracking, i.e. tournament with best of 3/5/7 etc.
-//  -
 
 // Game options - global variables
 let gridSize = 3;
@@ -16,7 +13,20 @@ let player1Selected = false;
 let player2Selected = false;
 let gameBoard = generateGameBoard(gridSize);
 
-let screens = ["splash", "settings", "player-select", "match-up", "game"];
+const Screen = Object.freeze({
+  SPLASH: "splash",
+  OPTIONS: "options",
+  PLAYER_SELECT: "player-select",
+  MATCH_UP: "match_up",
+  GAME: "game",
+});
+
+const WinningCondition = Object.freeze({
+  COLUMN: "column",
+  ROW: "row",
+  DIAGONAL: "diagonal",
+  TIE: "tie",
+});
 
 // Player profiles
 let player1 = {
@@ -117,10 +127,28 @@ let message = document.querySelector("#message");
 const audio = document.querySelector("audio");
 
 // Buttons
-let splashPlayBtn = document.querySelector("#splash-play-btn");
-let optionsBtn = document.querySelector("#options-btn");
-let saveoptionsBtn = document.querySelector("#save-options-btn");
-let endGameBtn = document.querySelector("#end-game-btn");
+let splashPlayBtn = document
+  .querySelector("#splash-play-btn")
+  .addEventListener("click", function () {
+    goToScreen(Screen.PLAYER_SELECT);
+  });
+let optionsBtn = document
+  .querySelector("#options-btn")
+  .addEventListener("click", function () {
+    goToScreen(Screen.OPTIONS);
+  });
+let saveoptionsBtn = document
+  .querySelector("#save-options-btn")
+  .addEventListener("click", function () {
+    goToScreen(Screen.SPLASH);
+  });
+let endGameBtn = document
+  .querySelector("#end-game-btn")
+  .addEventListener("click", function () {
+    // Need to reset all player selections, gameboarstatus
+    goToScreen(Screen.SPLASH);
+    endGame();
+  });
 
 // Game Screen
 let player1Game = document.querySelector("#p1-game-image");
@@ -139,20 +167,119 @@ let player1Score = document.querySelector("#p1-score");
 let player2Score = document.querySelector("#p2-score");
 let gameMessageElement = document.querySelector("#game-message");
 
-splashPlayBtn.addEventListener("click", function () {
-  goToScreen("player-select");
-});
-optionsBtn.addEventListener("click", function () {
-  goToScreen("options");
-});
-saveoptionsBtn.addEventListener("click", function () {
+// Options Screen
+let boardSizeOptions = document.querySelectorAll(".board-size");
+let numGames = document.querySelectorAll(".num-games");
+let timeLimitOptions = document.querySelectorAll(".time-option");
+let musicOptions = document.querySelectorAll(".music-option");
+let allOptions = [boardSizeOptions, numGames, timeLimitOptions, musicOptions];
+
+// Player Selection
+let playerSelect = document.querySelectorAll(".player-grid img");
+let player1Portrait = document.querySelector("#player1");
+let player2Portrait = document.querySelector("#player2");
+let player1MatchUp = document.querySelector("#match-up1");
+let player2MatchUp = document.querySelector("#match-up2");
+
+// Start Game on page load
+playGame();
+
+// Functions
+function playGame() {
+  // Start game with blank gameboard
+  setEventListeners();
   goToScreen("splash");
-});
-endGameBtn.addEventListener("click", function () {
-  // Need to reset all player selections, gameboarstatus
-  goToScreen("splash");
-  endGame();
-});
+  displayGameBoard();
+}
+
+function setEventListeners() {
+  // Set options event listeners
+  for (let i = 0; i < allOptions.length; i++) {
+    selectOption(allOptions[i]);
+  }
+
+  // Player Select grid
+  for (let i = 0; i < playerSelect.length; i++) {
+    var currentPlayer = playerSelect[i];
+
+    currentPlayer.addEventListener("mouseover", function (e) {
+      let target = e.target;
+
+      for (let i = 0; i < characterPortraits.length; i++) {
+        // If player 1 has been selected, hovering shows player 2's character
+        if (player1Selected === false) {
+          if (target.id === characterPortraits[i].name) {
+            player1.avatar = characterPortraits[i].name;
+            player1Portrait.src = characterPortraits[i].image;
+            player1MatchUp.src = characterPortraits[i].matchUp;
+            player1Game.src = characterPortraits[i].small;
+            player1Name.innerHTML = `<h2>${player1.avatar.toUpperCase()}</h2>`;
+          }
+        } else if (player2Selected === false) {
+          if (target.id === characterPortraits[i].name) {
+            player2.avatar = characterPortraits[i].name;
+            player2Portrait.src = characterPortraits[i].imageReverse;
+            player2MatchUp.src = characterPortraits[i].matchUpReverse;
+            player2Game.src = characterPortraits[i].small;
+            player2Name.innerHTML = `<h2>${player2.avatar.toUpperCase()}</h2>`;
+          }
+        }
+      }
+    });
+
+    currentPlayer.addEventListener("click", function (e) {
+      let target = e.target;
+
+      if (player1Selected === false) {
+        player1Selected = true;
+        player1.avatar = target.id;
+      } else if (player2Selected === false) {
+        player2Selected = true;
+        player2.avatar = target.id;
+
+        // Both players selected, move to next screen
+        goToScreen(Screen.MATCH_UP);
+
+        // Wait for match up screen music to play out, then move to the gamescreen
+        setTimeout(function () {
+          goToScreen(Screen.GAME);
+        }, 3500);
+      }
+    });
+  }
+}
+
+function goToScreen(screen) {
+  // Reset all screens
+  splashScreen.style.display = "none";
+  optionsScreen.style.display = "none";
+  playerSelectScreen.style.display = "none";
+  matchUpScreen.style.display = "none";
+  gameScreen.style.display = "none";
+
+  if (screen === Screen.SPLASH) {
+    splashScreen.style.display = "flex";
+  } else if (screen === Screen.OPTIONS) {
+    optionsScreen.style.display = "flex";
+  } else if (screen === Screen.PLAYER_SELECT) {
+    audio.src = "./assets/playerselect.mp3";
+    playerSelectScreen.style.display = "flex";
+  } else if (screen === Screen.MATCH_UP) {
+    audio.src = "./assets/startbattle.mp3";
+    matchUpScreen.style.display = "flex";
+  } else if (screen === Screen.GAME) {
+    audio.src = "./assets/ryutheme.mp3";
+    gameScreen.style.display = "flex";
+    mainElement.style.background = "url(./assets/game-background.jpg)";
+    gameMessage(`Round ${round}`);
+    setTimeout(function () {
+      gameMessage("FIGHT!!");
+      setTimeout(function () {
+        resetGameBoard();
+      }, 1500);
+    }, 1500);
+  }
+}
 
 function endGame() {
   audio.src = "./assets/menu.mp3";
@@ -177,51 +304,6 @@ function endGame() {
   resetGameBoard();
 }
 
-function goToScreen(screen) {
-  // Reset all screens
-  splashScreen.style.display = "none";
-  optionsScreen.style.display = "none";
-  playerSelectScreen.style.display = "none";
-  matchUpScreen.style.display = "none";
-  gameScreen.style.display = "none";
-
-  if (screen === "splash") {
-    splashScreen.style.display = "flex";
-  } else if (screen === "options") {
-    optionsScreen.style.display = "flex";
-  } else if (screen === "player-select") {
-    audio.src = "./assets/playerselect.mp3";
-    playerSelectScreen.style.display = "flex";
-  } else if (screen === "match-up") {
-    audio.src = "./assets/startbattle.mp3";
-    matchUpScreen.style.display = "flex";
-  } else if (screen === "game") {
-    audio.src = "./assets/ryutheme.mp3";
-    gameScreen.style.display = "flex";
-    mainElement.style.background = "url(./assets/game-background.jpg)";
-    gameMessage(`Round ${round}`);
-    setTimeout(function () {
-      gameMessage("FIGHT!!");
-      setTimeout(function () {
-        resetGameBoard();
-      }, 1500);
-    }, 1500);
-  }
-}
-
-// Options Screen
-let boardSizeOptions = document.querySelectorAll(".board-size");
-let numGames = document.querySelectorAll(".num-games");
-let timeLimitOptions = document.querySelectorAll(".time-option");
-let musicOptions = document.querySelectorAll(".music-option");
-
-let allOptions = [boardSizeOptions, numGames, timeLimitOptions, musicOptions];
-
-// Set options event listeners
-for (let i = 0; i < allOptions.length; i++) {
-  selectOption(allOptions[i]);
-}
-
 function selectOption(optionsList) {
   for (let i = 0; i < optionsList.length; i++) {
     let currentOption = optionsList[i];
@@ -235,9 +317,7 @@ function selectOption(optionsList) {
         //display the new board
         const grid = document.querySelector("#grid-container");
         grid.remove();
-        console.log("removed");
         gameBoard = generateGameBoard(gridSize);
-
         displayGameBoard();
       } else if (classList.contains("num-games")) {
         var newNumGames = parseInt(target.innerText);
@@ -249,13 +329,11 @@ function selectOption(optionsList) {
           timeLimit = false;
         }
       } else if (classList.contains("music-option")) {
-        console.log(target);
         if (target.innerText === "YES") {
           musicPlaying = true;
         } else {
           musicPlaying = false;
         }
-        console.log(musicPlaying);
         musicToggle();
       }
 
@@ -286,62 +364,6 @@ function musicToggle() {
   }
 }
 
-// Player Selection
-let playerSelect = document.querySelectorAll(".player-grid img");
-let player1Portrait = document.querySelector("#player1");
-let player2Portrait = document.querySelector("#player2");
-let player1MatchUp = document.querySelector("#match-up1");
-let player2MatchUp = document.querySelector("#match-up2");
-
-for (let i = 0; i < playerSelect.length; i++) {
-  var currentPlayer = playerSelect[i];
-
-  currentPlayer.addEventListener("mouseover", function (e) {
-    let target = e.target;
-
-    for (let i = 0; i < characterPortraits.length; i++) {
-      // If player 1 has been selected, hovering shows player 2's character
-      if (player1Selected === false) {
-        if (target.id === characterPortraits[i].name) {
-          player1.avatar = characterPortraits[i].name;
-          player1Portrait.src = characterPortraits[i].image;
-          player1MatchUp.src = characterPortraits[i].matchUp;
-          player1Game.src = characterPortraits[i].small;
-          player1Name.innerHTML = `<h2>${player1.avatar.toUpperCase()}</h2>`;
-        }
-      } else if (player2Selected === false) {
-        if (target.id === characterPortraits[i].name) {
-          player2.avatar = characterPortraits[i].name;
-          player2Portrait.src = characterPortraits[i].imageReverse;
-          player2MatchUp.src = characterPortraits[i].matchUpReverse;
-          player2Game.src = characterPortraits[i].small;
-          player2Name.innerHTML = `<h2>${player2.avatar.toUpperCase()}</h2>`;
-        }
-      }
-    }
-  });
-
-  currentPlayer.addEventListener("click", function (e) {
-    let target = e.target;
-
-    if (player1Selected === false) {
-      player1Selected = true;
-      player1.avatar = target.id;
-    } else if (player2Selected === false) {
-      player2Selected = true;
-      player2.avatar = target.id;
-
-      // Both players selected, move to next screen
-      goToScreen("match-up");
-
-      // Wait for match up screen music to play out, then move to the gamescreen
-      setTimeout(function () {
-        goToScreen("game");
-      }, 3500);
-    }
-  });
-}
-
 ////// TIC TAC TOE GAME LOGIC
 
 // Values in gameBoard represent a player's action
@@ -365,12 +387,6 @@ function gridTemplateString(gridSize) {
   return gridValue;
 }
 
-function playGame() {
-  // Start game with blank gameboard
-  goToScreen("splash");
-  displayGameBoard();
-}
-
 function displayGameBoard() {
   // Add main grid container
   const container = document.querySelector("#gameboard");
@@ -384,16 +400,7 @@ function displayGameBoard() {
   for (let i = 0; i < gameBoard.length; i++) {
     const newSquare = document.createElement("div");
     newSquare.id = `${i}`;
-    grid.appendChild(newSquare);
-  }
-
-  // Add event listeners to each square
-  const squares = document.querySelectorAll("#grid-container div");
-
-  for (let i = 0; i < squares.length; i++) {
-    const squareClicked = squares[i];
-
-    squareClicked.addEventListener("click", function (e) {
+    newSquare.addEventListener("click", function (e) {
       // Get square that was clicked
       let boardIndex = parseInt(e.target.id);
 
@@ -408,6 +415,7 @@ function displayGameBoard() {
         updateGameBoard();
       }
     });
+    grid.appendChild(newSquare);
   }
 }
 
@@ -444,7 +452,6 @@ function postRound(result) {
 
   // Check if game over
 
-  console.log(result);
   if (result != "tie") {
     if (numberOfGames === 7) {
       if (winner.results.wins === 5) {
@@ -553,10 +560,14 @@ function resetGameBoard() {
 }
 
 function checkRoundWinner() {
-  if (checkMatrix("row") || checkMatrix("column") || checkMatrix("diagonal")) {
+  if (
+    checkMatrix(WinningCondition.ROW) ||
+    checkMatrix(WinningCondition.COLUMN) ||
+    checkMatrix(WinningCondition.DIAGONAL)
+  ) {
     return whoseTurn;
   } else if (checkTie()) {
-    return "tie";
+    return WinningCondition.TIE;
   } else {
     return null;
   }
@@ -564,12 +575,12 @@ function checkRoundWinner() {
 
 function checkMatrix(matrix) {
   let checkMatrix;
-  if (matrix === "row") {
-    checkMatrix = rowMatrix();
-  } else if (matrix === "column") {
-    checkMatrix = columnMatrix();
-  } else if (matrix === "diagonal") {
-    checkMatrix = diagonalMatrix();
+  if (matrix === WinningCondition.ROW) {
+    checkMatrix = arrayOfRows();
+  } else if (matrix === WinningCondition.COLUMN) {
+    checkMatrix = arrayOfCOlumns();
+  } else if (matrix === WinningCondition.DIAGONAL) {
+    checkMatrix = arraOfDiagonals();
   }
 
   // Check if values in each matrix array are equal
@@ -586,7 +597,7 @@ function checkMatrix(matrix) {
   }
 }
 
-function rowMatrix() {
+function arrayOfRows() {
   let rows = [];
   for (let i = 0; i < gameBoard.length; i += gridSize) {
     rows.push(gameBoard.slice(i, i + gridSize));
@@ -594,22 +605,22 @@ function rowMatrix() {
   return rows;
 }
 
-function columnMatrix() {
-  let columnMatrix = [];
+function arrayOfCOlumns() {
+  let arrayOfCOlumns = [];
 
   for (let i = 0; i < gridSize; i++) {
     let column = [];
     for (let j = 0; j < gameBoard.length; j += gridSize) {
       column.push(gameBoard[i + j]);
     }
-    columnMatrix.push(column);
+    arrayOfCOlumns.push(column);
   }
-  return columnMatrix;
+  return arrayOfCOlumns;
 }
 
-function diagonalMatrix() {
+function arraOfDiagonals() {
   // Only 2 diagonals
-  let diagonalMatrix = [];
+  let arraOfDiagonals = [];
 
   let diagonal1 = [];
   for (let i = 0; i < gameBoard.length; i += gridSize + 1) {
@@ -625,9 +636,9 @@ function diagonalMatrix() {
     diagonal2.push(gameBoard[i]);
   }
 
-  diagonalMatrix.push(diagonal1, diagonal2);
+  arraOfDiagonals.push(diagonal1, diagonal2);
 
-  return diagonalMatrix;
+  return arraOfDiagonals;
 }
 
 function checkTie() {
@@ -639,5 +650,3 @@ function checkTie() {
 }
 
 // Start game
-
-playGame();
